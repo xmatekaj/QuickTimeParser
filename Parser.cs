@@ -14,7 +14,8 @@ namespace QuickTimeParser
         private bool ShowData { get; set; }
         private int ChunkSize { get; set; }
 
-        private List<TrackInfo> tracks = new List<TrackInfo>();
+        public List<TrackInfo> Tracks = new List<TrackInfo>();
+
         private List<(long position, ulong size)> mdatAtoms = new List<(long, ulong)>();
 
         public Parser(bool deepScan, bool showData)
@@ -80,7 +81,7 @@ namespace QuickTimeParser
 
                     if (atomType == "trak")
                     {
-                        tracks.Add(new TrackInfo());
+                        Tracks.Add(new TrackInfo());
                         long dataPosition = reader.BaseStream.Position;
                         long dataSize = atomSize > 8 ? atomSize - 8 : (endPosition - dataPosition);
                         ParseAtoms(reader, reader.BaseStream.Position + atomDataSize, atomType);
@@ -143,9 +144,9 @@ namespace QuickTimeParser
         {
             reader.BaseStream.Seek(8, SeekOrigin.Current); // Skip version and flags
             string handlerType = new string(reader.ReadChars(4));
-            if (tracks.Count > 0)
+            if (Tracks.Count > 0)
             {
-                var currentTrack = tracks[tracks.Count - 1];
+                var currentTrack = Tracks[Tracks.Count - 1];
                 if (handlerType == "vide")
                     currentTrack.Type = TrackType.Video;
                 else if (handlerType == "soun")
@@ -155,9 +156,9 @@ namespace QuickTimeParser
 
         private void ParseTrackHeaderAtom(BinaryReader reader)
         {
-            if (tracks.Count == 0) return;
+            if (Tracks.Count == 0) return;
 
-            var currentTrack = tracks[tracks.Count - 1];
+            var currentTrack = Tracks[Tracks.Count - 1];
 
             byte version = reader.ReadByte();
             reader.BaseStream.Seek(3, SeekOrigin.Current); // Skip flags
@@ -202,9 +203,9 @@ namespace QuickTimeParser
             uint numberOfEntries = BitConverter.ToUInt32(reader.ReadBytes(4).Reverse().ToArray(), 0);
             PrintAdditionalInformation($"Number of entries in stsd: {numberOfEntries}");
 
-            if (numberOfEntries > 0 && tracks.Count > 0)
+            if (numberOfEntries > 0 && Tracks.Count > 0)
             {
-                var currentTrack = tracks[tracks.Count - 1];
+                var currentTrack = Tracks[Tracks.Count - 1];
                 uint sampleDescriptionSize = BitConverter.ToUInt32(reader.ReadBytes(4).Reverse().ToArray(), 0);
                 string dataFormat = new string(reader.ReadChars(4));
                 PrintAdditionalInformation($"Data format: {dataFormat}");
@@ -236,15 +237,15 @@ namespace QuickTimeParser
         {
             Console.WriteLine("\nTrack Summary:");
 
-            if (tracks.Count == 0)
+            if (Tracks.Count == 0)
             {
-                Console.WriteLine("No tracks detected.");
+                Console.WriteLine("No Tracks detected.");
             }
             else
             {
-                for (int i = 0; i < tracks.Count; i++)
+                for (int i = 0; i < Tracks.Count; i++)
                 {
-                    var track = tracks[i];
+                    var track = Tracks[i];
                     Console.WriteLine($"Track {i + 1}:");
                     Console.WriteLine($"Type: {track.Type}");
                     if (track.Type == TrackType.Audio && track.AudioInfo != null)
