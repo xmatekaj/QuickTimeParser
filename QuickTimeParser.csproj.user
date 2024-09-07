@@ -14,8 +14,4 @@
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <StartWorkingDirectory>D:\dev\QuickTimeParser\bin\Debug\</StartWorkingDirectory>
-    <StartArguments>MOVIE_WISHBONE.mov</StartArguments>
-  </PropertyGroup>
 </Project>
